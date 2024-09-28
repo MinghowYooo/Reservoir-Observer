@@ -100,6 +100,7 @@ class Reservoir(object):
                 print("===========time: {} [s]==============".format(int(k*self.dt)))
             Y_hat[:,k] = self.predict(U[:,k])
         return Y_hat
+    
 
 
 def rossler_example():

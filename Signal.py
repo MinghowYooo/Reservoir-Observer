@@ -31,13 +31,21 @@ class Signal(object):
     """
     def __init__(self, signal_type, T):
         self.dt = signal_type.dt
-        self.T = self.dt*int(T/self.dt)
-        self.t = np.arange(0, self.T+self.dt, self.dt)
+        self.T = self.dt * int(T / self.dt)
+        self.t = np.arange(0, self.T + self.dt, self.dt)
 
-        self.f = signal_type.f
-        self.h = signal_type.h
-        
-        self.X = np.transpose(odeint(func=self.f, y0=signal_type.X0, t=self.t))
+        self.f = signal_type.f  # State transition function
+        self.h = signal_type.h  # Observation function
+
+        # Initialize states with the initial condition
+        self.X = np.zeros((len(signal_type.X0), len(self.t)))
+        self.X[:, 0] = signal_type.X0
+
+        # Apply the Euler method to solve the system
+        for i in range(1, len(self.t)):
+            self.X[:, i] = self.X[:, i-1] + self.dt * self.f(self.X[:, i-1], self.t[i-1])
+
+        # Calculate the observation variables
         self.Y = np.reshape(self.h(self.X), [-1, self.t.shape[0]])
 
 class Rossler(object):
